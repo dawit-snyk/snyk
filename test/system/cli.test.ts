@@ -11,6 +11,7 @@ import * as policy from 'snyk-policy';
 import stripAnsi from 'strip-ansi';
 import * as os from 'os';
 import * as isDocker from '../../src/lib/is-docker';
+import * as errors from '../../src/lib/errors/legacy-errors';
 
 type Ignore = {
   [path: string]: {
@@ -93,8 +94,6 @@ test('auth via key', async (t) => {
 });
 
 test('auth via invalid key', async (t) => {
-  const errors = require('../../src/lib/errors/legacy-errors');
-
   try {
     const res = await cli.auth('_____________');
     t.fail('auth should not succeed: ' + res);
@@ -277,7 +276,6 @@ test('snyk ignore - no ID', async (t) => {
     });
     t.fail('should not succeed with missing ID');
   } catch (e) {
-    const errors = require('../../src/lib/errors/legacy-errors');
     const message = stripAnsi(errors.message(e));
     t.equal(
       message.toLowerCase().indexOf('id is a required field'),

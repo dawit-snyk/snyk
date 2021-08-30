@@ -16,7 +16,7 @@ const getVulnSource = require('./get-vuln-source');
 const dedupe = require('./dedupe-patches');
 const writePatchFlag = require('./write-patch-flag');
 const spinner = require('../spinner');
-const errors = require('../errors/legacy-errors');
+import * as errors from '../errors/legacy-errors';
 const analytics = require('../analytics');
 const getPatchFile = require('./fetch-patch');
 

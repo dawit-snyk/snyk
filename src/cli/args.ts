@@ -9,6 +9,7 @@ import {
 } from '../lib/types';
 import { getContainerImageSavePath } from '../lib/container';
 import { obfuscateArgs } from '../lib/utils';
+import errorsMethod from '../../src/lib/errors/legacy-errors';
 
 export declare interface Global extends NodeJS.Global {
   ignoreUnknownCA: boolean;
@@ -176,7 +177,7 @@ export function args(rawArgv: string[]): Args {
 
   if (!method) {
     // if we failed to find a command, then default to an error
-    method = require('../lib/errors/legacy-errors');
+    method = errorsMethod as any;
     argv._.push(command);
   }
 

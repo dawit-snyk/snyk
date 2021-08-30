@@ -8,7 +8,7 @@ const uniq = require('lodash.uniq');
 const isEmpty = require('lodash.isempty');
 const { parsePackageString: moduleToObject } = require('snyk-module');
 const semver = require('semver');
-const errors = require('../errors/legacy-errors');
+import * as errors from '../errors/legacy-errors';
 const npm = require('../npm');
 const { yarn } = require('../yarn');
 const spinner = require('../spinner');

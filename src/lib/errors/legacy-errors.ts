@@ -1,4 +1,4 @@
-const config = require('../config');
+import { config } from '../config';
 const chalk = require('chalk');
 const { SEVERITIES } = require('../snyk-test/common');
 const analytics = require('../analytics');
@@ -64,40 +64,42 @@ const codes = {
   INVALID_SEVERITY_THRESHOLD: errors.invalidSeverityThreshold,
 };
 
-module.exports = function error(command) {
-  const e = new Error('Unknown command "' + command + '"');
+interface SnykLegacyError extends Error {
+  code: string;
+  userMessage: string;
+}
+
+export default function error(command) {
+  const e = new Error('Unknown command "' + command + '"') as SnykLegacyError;
   e.code = 'UNKNOWN_COMMAND';
   return Promise.reject(e);
-};
+}
 
-module.exports.message = function(error) {
-  let message = error; // defaults to a string (which is super unlikely)
-  if (error instanceof Error) {
-    if (error.code === 'VULNS') {
-      return error.message;
-    }
-
-    // try to lookup the error string based either on the error code OR
-    // the actual error.message (which can be "Unauthorized" for instance),
-    // otherwise send the error message back
-    message =
-      error.userMessage ||
-      codes[error.code || error.message] ||
-      errors[error.code || error.message];
-    if (message) {
-      message = message.replace(/(%s)/g, error.message).trim();
-      message = chalk.bold.red(message);
-    } else if (error.code) {
-      // means it's a code error
-      message =
-        'An unknown error occurred. Please run with `-d` and include full trace ' +
-        'when reporting to Snyk';
-      analytics.add('unknown-error-code', JSON.stringify(error));
-    } else {
-      // should be one of ours
-      message = error.message;
-    }
+export function message(error: SnykLegacyError | string): string {
+  if (typeof error === 'string') {
+    return error;
   }
 
-  return message;
-};
+  if (error.code === 'VULNS') {
+    return error.message;
+  }
+
+  // try to lookup the error string based either on the error code OR
+  // the actual error.message (which can be "Unauthorized" for instance),
+  // otherwise send the error message back
+  let message: string | void =
+    error.userMessage ||
+    codes[error.code || error.message] ||
+    errors[error.code || error.message];
+  if (message) {
+    message = message.replace(/(%s)/g, error.message).trim();
+    return chalk.bold.red(message);
+  } else if (error.code) {
+    // means it's a code error
+    analytics.add('unknown-error-code', JSON.stringify(error));
+    return 'An unknown error occurred. Please run with `-d` and include full trace when reporting to Snyk';
+  }
+
+  // should be one of ours
+  return error.message;
+}
