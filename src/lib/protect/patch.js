@@ -18,7 +18,7 @@ const writePatchFlag = require('./write-patch-flag');
 const spinner = require('../spinner');
 const errors = require('../errors/legacy-errors');
 const analytics = require('../analytics');
-const getPatchFile = require('./fetch-patch');
+import getPatchFile from './fetch-patch';
 
 function patch(vulns, live) {
   const lbl = 'Applying patches...';
